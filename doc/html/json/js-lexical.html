@@ -1,0 +1,762 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>Lexical Structure</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.0Gold (Win95; I) [Netscape]">
+</HEAD>
+<BODY>
+
+<P><A HREF="intro.htm">[Previous]</A> <A HREF="valvar.htm">[Next]</A> <A HREF="titlepg2.htm">[First]</A>
+<A HREF="llr.htm">[Last]</A> 
+<HR><A NAME="996824"></A></P>
+
+<P><A NAME="1006863"></A></P>
+
+<P><A NAME="1006843"></A></P>
+
+<H1>Lexical Structure</H1>
+
+<P><A NAME="1004599"></A>This chapter defines JavaScript's lexical grammar
+by specifying how input characters may be composed into white space, comments,
+and tokens.</P>
+
+<P><A NAME="Character Set"></A><A NAME="1004600"></A></P>
+
+<H2>2.1 Character Set</H2>
+
+<P><A NAME="1004601"></A>JavaScript programs are written using <I>ASCII,
+</I>the American Standard Code for Information Interchange (defined by
+ANSI standard X3.4). </P>
+
+<P><A NAME="Lexical Translations"></A><A NAME="1004603"></A></P>
+
+<H2>2.2 Lexical Translations</H2>
+
+<P><A NAME="1004604"></A>The translation of an ASCII character stream into
+a sequence of JavaScript tokens uses the following two lexical translations,
+which are applied in turn:</P>
+
+<OL>
+<P><A NAME="1005326"></A></P>
+
+<LI>A translation of the ASCII character stream into a stream of input
+characters and line terminators. </LI>
+
+<P><A NAME="1005364"></A></P>
+
+<LI>A translation of the stream of input characters and line terminators
+into a sequence of JavaScript input elements which, after white space and
+comments are discarded, comprise the tokens that are the terminal symbols
+of the syntactic grammar for JavaScript. </LI>
+</OL>
+
+<P><A NAME="1004607"></A>In these lexical translations JavaScript chooses
+the longest possible translation at each step, even if the result does
+not ultimately make a correct JavaScript program, while another lexical
+translation would.</P>
+
+<P><A NAME="Line Terminators"></A><A NAME="1004608"></A></P>
+
+<H2>2.3 Line Terminators</H2>
+
+<P><A NAME="1007055"></A>JavaScript divides the sequence of input characters
+into lines by recognizing <I>line terminators</I>. This definition of lines
+determines the line numbers produced by a JavaScript compiler or other
+system component. It also specifies the termination of a single-line comment.</P>
+
+<P><A NAME="1008215"></A>Lines are terminated by the ASCII characters CR,
+or LF, or CR LF. A CR immediately followed by LF is counted as one line
+terminator, not two. </P>
+
+<P><A NAME="1008167"></A></P>
+
+<PRE><I>RawInputCharacter:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LineTerminator
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputCharacter</I></PRE>
+
+<P><A NAME="1004610"></A></P>
+
+<PRE><I>LineTerminator:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the ASCII LF character, also known as &quot;newline&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the ASCII CR character, also known as &quot;return&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the ASCII CR character followed by the ASCII LF character</I></PRE>
+
+<P><A NAME="1008258"></A></P>
+
+<PRE><I>InputCharacter:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Any ASCII character, but not CR and not LF</I></PRE>
+
+<P><A NAME="1007549"></A>The result of this step is a sequence of line
+terminators and characters, which are the input for the second step in
+the tokenization process.</P>
+
+<P><A NAME="Input Elements and Tokens"></A><A NAME="1004613"></A></P>
+
+<H2>2.4 Input Elements and Tokens</H2>
+
+<P><A NAME="1004614"></A>The input characters and line terminators that
+result from input line recognition are reduced to a sequence of <I>input
+elements</I>. The input elements that are not white space or comments are
+JavaScript <I>tokens</I>.</P>
+
+<P><A NAME="1004615"></A>This process is specified by the following grammar:</P>
+
+<P><A NAME="1007534"></A></P>
+
+<PRE><I>InputElements:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputElement</I><SUB>opt</SUB> 
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputElements InputElement</I></PRE>
+
+<P><A NAME="1004618"></A></P>
+
+<PRE><I>InputElement:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WhiteSpace
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comment
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Token</I></PRE>
+
+<P><A NAME="1004619"></A></P>
+
+<PRE><I>WhiteSpace:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the ASCII SP character, also known as &quot;space&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the ASCII HT character, also known as &quot;horizontal tab&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the ASCII FF character, also known as &quot;form feed&quot;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LineTerminator</I></PRE>
+
+<P><A NAME="1004620"></A></P>
+
+<PRE><I>Token:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keyword
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Identifier
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Literal
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Separator
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Operator</I></PRE>
+
+<P><A NAME="1004622"></A>White space and comments can serve to separate
+tokens that, if adjacent, might be tokenized in another manner. For example,
+the characters <TT>-</TT> and <TT>=</TT> in the input can form the operator
+token <TT>-=</TT> only if there is no intervening white space or comment.</P>
+
+<P><A NAME="Head2;"></A><A NAME="1004623"></A></P>
+
+<H3>2.4.1 White Space</H3>
+
+<P><A NAME="1004624"></A><I>White space</I> is defined as the ASCII space,
+horizontal tab, and form feed characters, as well as line terminators.</P>
+
+<P><A NAME="Head2;"></A><A NAME="1004625"></A></P>
+
+<H3>2.4.2 Comments</H3>
+
+<P><A NAME="1004626"></A>JavaScript has two kinds of <I>comments</I>:</P>
+
+<P><A NAME="1005766"></A>A traditional C-style comment: all the text from
+<TT>/*</TT> to <TT>*/</TT> is ignored:</P>
+
+<P><A NAME="1007850"></A></P>
+
+<PRE><TT>/* </TT><I>text</I><TT> */ </TT></PRE>
+
+<P><A NAME="1007854"></A>A single-line C++-style comment: all the text
+from <TT>//</TT> to the end of the line is ignored:</P>
+
+<P><A NAME="1004628"></A></P>
+
+<PRE><TT>// </TT><I>text </I></PRE>
+
+<P><A NAME="1004629"></A>These comments are formally specified by the following
+lexical grammar:</P>
+
+<P><A NAME="1004630"></A></P>
+
+<PRE><I>Comment:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TraditionalComment
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SingleLineComment</I></PRE>
+
+<P><A NAME="1007896"></A></P>
+
+<PRE><I>TraditionalComment:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>/* <I>CommentText</I><SUB>opt</SUB> */</PRE>
+
+<P><A NAME="1007962"></A></P>
+
+<PRE>CommentText:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CommentCharacter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CommentText CommentCharacter</PRE>
+
+<P><A NAME="1007981"></A></P>
+
+<PRE><I>CommentCharacter:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NotStarSlash
+</I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/ <I>NotStar
+</I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* <I>NotSlash
+</I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>LineTerminator</I></PRE>
+
+<P><A NAME="1008040"></A></P>
+
+<PRE>NotStar
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputCharacter, but not *</PRE>
+
+<P><A NAME="1008041"></A></P>
+
+<PRE>NotSlash
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputCharacter, but not /</PRE>
+
+<P><A NAME="1008048"></A></P>
+
+<PRE><I>NotStarSlash
+</I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>InputCharacter</I>, but not * and not /</PRE>
+
+<P><A NAME="1007979"></A></P>
+
+<PRE><I>SingleLineComment</I>:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// <I>CharactersInLine</I><SUB>opt</SUB> <I>LineTerminator</I></PRE>
+
+<P><A NAME="1007969"></A></P>
+
+<PRE><I>CharactersInLine:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputCharacter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CharactersInLine InputCharacter</I></PRE>
+
+<P><A NAME="1004634"></A>The grammar implies all of the following properties:</P>
+
+<UL>
+<P><A NAME="1004635"></A></P>
+
+<LI>Multi-line comments cannot be nested </LI>
+
+<P><A NAME="1004636"></A></P>
+
+<LI>/* and */ have no special meaning in // comments. </LI>
+
+<P><A NAME="1004637"></A></P>
+
+<LI>// has no special meaning in either single-line or multi-line comments
+</LI>
+</UL>
+
+<P><A NAME="1004638"></A>As a result, these are legal comments:</P>
+
+<P><A NAME="1004639"></A></P>
+
+<PRE>/*<TT> </TT>this comment // ends here: */
+// This // just /* fine */ as far as JavaScript // is concerned</PRE>
+
+<P><A NAME="1008322"></A>But this causes a compile-time warning:</P>
+
+<P><A NAME="1008057"></A></P>
+
+<PRE>/* this comment /* causes a compile-time warning */</PRE>
+
+<P><A NAME="Keywords"></A><A NAME="1004642"></A></P>
+
+<H2>2.5 Keywords</H2>
+
+<P><A NAME="1004643"></A>The following sequences of ASCII letters are reserved
+for use as <I>keywords</I>, and are not legal identifiers:</P>
+
+<P><A NAME="1004644"></A></P>
+
+<PRE><I>Keyword</I>: one of</PRE>
+
+<TABLE CELLPADDING=5 >
+<CAPTION></CAPTION>
+
+<TR>
+<TD valign=baseline align=left>
+<UL>
+<P><A NAME="1006414"></A><TT>abstract<BR>
+boolean<BR>
+break<BR>
+byte<BR>
+case<BR>
+catch<BR>
+char<BR>
+class<BR>
+const<BR>
+continue<BR>
+default<BR>
+delete<BR>
+do<BR>
+double</TT></P>
+</UL>
+</TD>
+
+<TD valign=baseline align=left><A NAME="1006408"></A><TT>else<BR>
+extends<BR>
+final<BR>
+finally<BR>
+float<BR>
+for<BR>
+function<BR>
+goto<BR>
+if<BR>
+implements<BR>
+import<BR>
+in<BR>
+instanceof<BR>
+int</TT></TD>
+
+<TD valign=baseline align=left><A NAME="1006410"></A><TT>interface<BR>
+long<BR>
+native<BR>
+new<BR>
+package<BR>
+private<BR>
+protected<BR>
+public<BR>
+return<BR>
+short<BR>
+static<BR>
+super<BR>
+switch<BR>
+synchronized</TT></TD>
+
+<TD valign=baseline align=left><A NAME="1006412"></A><TT>this<BR>
+throw<BR>
+throws<BR>
+transient<BR>
+try<BR>
+typeof<BR>
+var<BR>
+void<BR>
+volatile<BR>
+while<BR>
+with</TT> </TD>
+</TR>
+</TABLE>
+
+<P><A NAME="1006181"></A>The above list includes all keywords used currently
+and reserved for future use. The following table lists keywords used in
+JavaScript version 1.1: </P>
+
+<TABLE CELLPADDING=5 >
+<CAPTION></CAPTION>
+
+<TR>
+<TD valign=baseline align=left>
+<UL>
+<P><A NAME="1007242"></A><TT>break<BR>
+continue<BR>
+delete<BR>
+else<BR>
+for<BR>
+function<BR>
+if<BR>
+in</TT></P>
+</UL>
+</TD>
+
+<TD valign=baseline align=left><A NAME="1007244"></A><TT>new<BR>
+return<BR>
+this<BR>
+typeof<BR>
+var<BR>
+void<BR>
+while<BR>
+with</TT> </TD>
+</TR>
+</TABLE>
+
+<P><A NAME="1004711"></A>While <TT>true</TT> and <TT>false</TT> might appear
+to be keywords, they are technically Boolean literals; while <TT>null</TT>
+might appear to be a keyword, it is technically an object literal.</P>
+
+<P><A NAME="Identifiers"></A><A NAME="1004712"></A></P>
+
+<H2>2.6 Identifiers</H2>
+
+<P><A NAME="1004713"></A>An <I>identifier</I> is an unlimited-length sequence
+of ASCII <I>letters</I> and <I>digits</I>, the first of which must be a
+letter. The letters include uppercase and lowercase ASCII letters (a-z
+and A-Z) and the ASCII underscore (_) and dollar sign (<TT>$</TT>). The
+digits include the AS<I>CII digits 0-9.</I></P>
+
+<P><A NAME="1004714"></A></P>
+
+<PRE><I>Identifier:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IdentifierChars, but not a Keyword or BooleanLiteral or NullLiteral</I></PRE>
+
+<P><A NAME="1008513"></A></P>
+
+<PRE><I>IdentifierChars:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JavaScriptLetter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IdentifierChars JavaScriptLetterOrDigit</I></PRE>
+
+<P><A NAME="1004715"></A></P>
+
+<PRE><I>JavaScriptLetter:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;any uppercase or lowercase ASCII letter (a-z, A-Z)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$</I></PRE>
+
+<P><A NAME="1008532"></A></P>
+
+<PRE><I>JavaScriptLetterOrDigit:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JavaScriptLetter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;any digit (0-9)</I></PRE>
+
+<P><A NAME="1004719"></A>Examples of legal identifiers are</P>
+
+<P><A NAME="1004720"></A></P>
+
+<PRE><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number_hits
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;temp99
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_name
+</TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$6million</PRE>
+
+<P><A NAME="Literals"></A><A NAME="1004723"></A></P>
+
+<H2>2.7 Literals</H2>
+
+<P><A NAME="1004724"></A>A <I>literal</I> is the source code representation
+of a value of a primitive type:</P>
+
+<P><A NAME="1004725"></A></P>
+
+<PRE><I>Literal:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntegerLiteral
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FloatingPointLiteral
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BooleanLiteral
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringLiteral
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NullLiteral</I></PRE>
+
+<P><A NAME="Head2;"></A><A NAME="1004727"></A></P>
+
+<H3>2.7.1 Integer Literals</H3>
+
+<P><A NAME="1004729"></A>Integer literals may be expressed in decimal (base
+10), hexadecimal (base 16), or octal (base 8):</P>
+
+<P><A NAME="1004730"></A></P>
+
+<PRE><I>IntegerLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DecimalLiteral 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HexLiteral 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OctalLiteral </I></PRE>
+
+<P><A NAME="1004731"></A>A decimal literal consists of a lone 0, or a digit
+from <TT>1 </TT>to <TT>9</TT> followed by zero or more digits from <TT>0
+</TT>to <TT>9</TT>, and represents a nonnegative integer:</P>
+
+<P><A NAME="1004732"></A></P>
+
+<PRE><I>DecimalLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NonZeroDigit Digits</I><SUB>opt</SUB></PRE>
+
+<P><A NAME="1004733"></A></P>
+
+<PRE><I>Digits:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digits Digit</I></PRE>
+
+<P><A NAME="1004734"></A></P>
+
+<PRE><I>Digit:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NonZeroDigit</I></PRE>
+
+<P><A NAME="1004735"></A></P>
+
+<PRE><I>NonZeroDigit: </I>one of
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 2 3 4 5 6 7 8 9</PRE>
+
+<P><A NAME="1004736"></A>A hexadecimal literal consists of a leading <TT>0x</TT>
+or <TT>0X</TT> followed by one or more hexadecimal digits and can represent
+a nonnegative integer. Hexadecimal digits with values 10 through 15 are
+represented by the letters <TT>a</TT> through <TT>f</TT> or <TT>A</TT>
+through <TT>F</TT>, respectively; each letter used as a hexadecimal digit
+may be uppercase or lowercase.</P>
+
+<P><A NAME="1004737"></A></P>
+
+<PRE><I>HexLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>0x <I>HexDigit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>0X<I> HexDigit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HexLiteral HexDigit</I></PRE>
+
+<P><A NAME="1004738"></A></P>
+
+<PRE><I>HexDigit: </I>one of
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F</PRE>
+
+<P><A NAME="1004739"></A>An octal literal consists of a digit <TT>0</TT>
+followed by one or more of the digits <TT>0</TT> through <TT>7</TT> and
+can represent a nonnegative integer<I>.</I></P>
+
+<P><A NAME="1004740"></A></P>
+
+<PRE><I>OctalLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>0 <I>OctalDigit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OctalLiteral OctalDigit</I></PRE>
+
+<P><A NAME="1004741"></A></P>
+
+<PRE><I>OctalDigit: </I>one of
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 1 2 3 4 5 6 7</PRE>
+
+<P><A NAME="1004743"></A>The largest hexadecimal and octal literals are
+<TT>0xffffffff</TT> and <TT>037777777777</TT>, respectively, which equal
+<TT>4294967295</TT>. A compile-time error occurs for any integer literal
+of greater value.</P>
+
+<P><A NAME="1004745"></A>Examples of integer literals:</P>
+
+<P><A NAME="1004746"></A></P>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1996
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0372
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0xDeadBeef
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x00FF88FF</PRE>
+
+<P><A NAME="Head2;"></A><A NAME="1004752"></A></P>
+
+<H3>2.7.2 Floating-Point Literals</H3>
+
+<P><A NAME="1004754"></A>A floating-point literal has the following parts:
+a whole-number part, a decimal point, a fractional part, an exponent, and
+a type suffix. The exponent, if present, is indicated by a letter <TT>e</TT>
+or <TT>E</TT> followed by an optionally signed integer.</P>
+
+<P><A NAME="1004755"></A>At least one digit, in either the whole number
+or the fraction part, and either a decimal point or an exponent, are required.
+All other parts are optional.</P>
+
+<P><A NAME="1004757"></A></P>
+
+<PRE><I>FloatingPointLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digits . Digits</I><SUB>opt</SUB> <I>ExponentPart</I>opt<I> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;. Digits ExponentPart</I><SUB>opt</SUB> 
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Digits ExponentPart</I></PRE>
+
+<P><A NAME="1004758"></A></P>
+
+<PRE><I>ExponentPart:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExponentIndicator SignedInteger</I></PRE>
+
+<P><A NAME="1004759"></A></P>
+
+<PRE><I>ExponentIndicator: </I>one of
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e E</PRE>
+
+<P><A NAME="1004760"></A></P>
+
+<PRE><I>SignedInteger:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sign</I><SUB>opt</SUB><I> Digits</I></PRE>
+
+<P><A NAME="1004761"></A></P>
+
+<PRE><I>Sign: </I>one of
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ -</PRE>
+
+<P><A NAME="1007656"></A>The largest positive finite floating point literal
+is 1.79769313486231570e+308. The smallest positive finite floating point
+literal is 4.94065645841246544e-324.</P>
+
+<P><A NAME="1008637"></A>A compile-time error occurs if a non-zero floating
+point literal is too large, so that on rounded conversion to its internal
+representation, it becomes an IEEE 754 infinity.<SUP><A HREF="#1008740">1</A></SUP>
+A JavaScript program can represent infinities without producing a compile-time
+error by using the predefined constants Number.POSITIVE_INFINITY and Number.NEGATIVE_INFINITY.</P>
+
+<P><A NAME="1008647"></A>A compile-time error occurs if a nonzero floating-point
+literal is too small, so that, on rounded conversion to its internal representation,
+it becomes a zero. A compile-time error does not occur if a nonzero floating-point
+literal has a small value that, on rounded conversion to its internal representation,
+becomes a nonzero denormalized number.<SUP><A HREF="#1008755">2</A></SUP></P>
+
+<P><A NAME="1008611"></A>Examples of floating-point literals are:</P>
+
+<P><A NAME="1004767"></A></P>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.3
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1e-9</PRE>
+
+<P><A NAME="Head2;"></A><A NAME="1004768"></A></P>
+
+<H3>2.7.3 Boolean Literals</H3>
+
+<P><A NAME="1004769"></A>The <TT>boolean</TT> type has two values, represented
+by the literals <TT>true</TT> and <TT>false</TT>.</P>
+
+<P><A NAME="1008684"></A></P>
+
+<PRE><I>BooleanLiteral</I>:
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>true<I> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>false</PRE>
+
+<P><A NAME="Head2;"></A><A NAME="1008685"></A></P>
+
+<H3>2.7.4 String Literals</H3>
+
+<P><A NAME="1004773"></A>A string literal is zero or more characters, enclosed
+in single (') or double (&quot;)quotes.</P>
+
+<P><A NAME="1008695"></A></P>
+
+<PRE><I>StringLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot; StringCharactersDQ</I><SUB>opt</SUB><I> &quot; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>' <I>StringCharactersSQ</I><SUB>opt</SUB><I> '</I></PRE>
+
+<P><A NAME="1004775"></A></P>
+
+<PRE><I>StringCharactersDQ:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringCharacterDQ
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringCharactersDQ StringCharacterDQ</I></PRE>
+
+<P><A NAME="1004776"></A></P>
+
+<PRE><I>StringCharactersSQ:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringCharacterSQ
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringCharactersSQ StringCharacterSQ</I></PRE>
+
+<P><A NAME="1004777"></A></P>
+
+<PRE><I>StringCharacterDQ:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputCharacter, </I>but not &quot; or 
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EscapeSequence</I></PRE>
+
+<P><A NAME="1004778"></A></P>
+
+<PRE><I>StringCharacterSQ
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputCharacter, </I>but not ' or 
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EscapeSequence</I></PRE>
+
+<P><A NAME="1004779"></A>The escape sequences are described in section
+<A HREF="lexical.htm#1004792">2.7.5&nbsp;Escape Sequences for String Literals</A>.</P>
+
+<P><A NAME="1004782"></A>It is a compile-time error for a line terminator
+to appear after the opening &quot; and before the closing &quot;. A long
+string literal can be broken up into shorter pieces and written as a expression
+using the string concatenation operator <TT>+</TT>.</P>
+
+<P><A NAME="1004783"></A>Examples of string literals:</P>
+
+<P><A NAME="1004784"></A></P>
+
+<PRE>&quot;&quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// The empty string
+&quot;&quot;&quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// A string containing &quot; alone
+`This is a string'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// A string containing 16 characters
+
+&quot;This is a &quot; +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Actually a string-valued expression
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;two-line string&quot;&nbsp;&nbsp;&nbsp;// containing two string literals</PRE>
+
+<P><A NAME="Head2;"></A><A NAME="1004792"></A></P>
+
+<H3>2.7.5 Escape Sequences for String Literals</H3>
+
+<P><A NAME="1004793"></A>The string <I>escape sequences</I> allow for the
+representation of some nongraphic characters as well as the single quote,
+double quote, and backslash characters in string literals.</P>
+
+<P><A NAME="1004794"></A></P>
+
+<PRE><I>EscapeSequence</I>:
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> b (backspace BS)
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> t (horizontal tab HT )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> n (linefeed LF )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> f (form feed FF )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> r (carriage return CR )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> &quot; (double quote &quot; )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I> ' (single quote ' )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>  (backslash  )
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>OctalEscape
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>HexEscape</PRE>
+
+<P><A NAME="1004796"></A></P>
+
+<PRE><I>OctalEscape:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OctalDigit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OctalDigit OctalDigit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ZeroToThree OctalDigit OctalDigit</I></PRE>
+
+<P><A NAME="1008722"></A></P>
+
+<PRE><I>OctalDigit: </I>one of
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I><TT>0 1 2 3 4 5 6 7</TT></PRE>
+
+<P><A NAME="1004797"></A></P>
+
+<PRE><I>ZeroToThree: </I>one of
+<I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I><TT>0 1 2 3</TT></PRE>
+
+<P><A NAME="1007290"></A></P>
+
+<PRE><I>HexEscape:</I></PRE>
+
+<P><A NAME="1007297"></A></P>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xHexDigit HexDigit</PRE>
+
+<P><A NAME="1007286"></A></P>
+
+<PRE><I>HexDigit: </I>one of
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F</PRE>
+
+<P><A NAME="Head2;"></A><A NAME="1004801"></A></P>
+
+<H3>2.7.6 The Null Literal</H3>
+
+<P><A NAME="1004802"></A>The null object reference is denoted by the literal
+<TT>null</TT>.</P>
+
+<P><A NAME="1004803"></A></P>
+
+<PRE><I>NullLiteral:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I><TT>null</TT></PRE>
+
+<P><A NAME="Separators"></A><A NAME="1004804"></A></P>
+
+<H2>2.8 Separators</H2>
+
+<P><A NAME="1004805"></A>The following characters are used in JavaScript
+as <I>separators </I>(punctuators):</P>
+
+<P><A NAME="1004806"></A></P>
+
+<PRE>Separator: one of</PRE>
+
+<P><A NAME="1004807"></A></P>
+
+<PRE><I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</I>( ) { } [ ] ; ,</PRE>
+
+<P><A NAME="Operators"></A><A NAME="1004808"></A></P>
+
+<H2>2.9 Operators</H2>
+
+<P><A NAME="1004809"></A>The following tokens are used in JavaScript as
+<I>operators</I>. Note that dot (.) is an operator in JavaScript, wheras
+it is a separtor in Java.</P>
+
+<P><A NAME="1008886"></A></P>
+
+<PRE>Operator: one of:</PRE>
+
+<P><A NAME="1008892"></A>= &gt; &lt; ! ~ ? : .<BR>
+== &lt;= &gt;= != &amp;&amp; || ++ --<BR>
++ - * / &amp; | ^ % &lt;&lt; &gt;&gt; &gt;&gt;&gt;<BR>
++= -= *= /= &amp;= |= ^= %= &lt;&lt;= &gt;&gt;= &gt;&gt;&gt;=</P>
+
+<P><A NAME="1008890"></A></P>
+
+<P>
+<HR></P>
+
+<H1>Footnotes</H1>
+
+<P><SUP>1<A NAME="1008740"></A></SUP> JavaScript 1.1 as implemented in
+Navigator 3.0 fails to report this error.</P>
+
+<P><SUP>2<A NAME="1008755"></A></SUP> JavaScript 1.1 as implemented in
+Navigator 3.0 fails to report this error.</P>
+
+<P>
+<HR><A HREF="intro.htm">[Previous]</A> <A HREF="valvar.htm">[Next]</A>
+<A HREF="titlepg2.htm">[First]</A> <A HREF="llr.htm">[Last]</A> </P>
+
+</BODY>
+</HTML>
