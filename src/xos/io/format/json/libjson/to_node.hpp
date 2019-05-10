@@ -22,6 +22,7 @@
 #define _XOS_IO_FORMAT_JSON_LIBJSON_TO_NODE_HPP
 
 #include "xos/io/format/json/node.hpp"
+#include "xos/io/reader.hpp"
 #include "xos/io/logger.hpp"
 #include <libjson.h>
 
@@ -50,6 +51,9 @@ public:
     typedef TString string_t;
     typedef typename string_t::char_t char_t;
     
+    to_nodet(node_t& to, char_reader& from): to_(0), v_(0) {
+        this->to(to, from);
+    }
     to_nodet(node_t& to, const char_string& from): to_(0), v_(0) {
         this->to(to, from);
     }
@@ -60,6 +64,14 @@ public:
     virtual ~to_nodet() {
     }
 
+    virtual node_t& to(node_t& to, char_reader& from) {
+        char c = 0; 
+        char_string s;
+        while (0 < from.read(&c, 1)) {
+            s.append(&c, 1);
+        }
+        return this->to(to, s);
+    }
     virtual node_t& to(node_t& to,const char_string& from) {
         v_ = &to;
         to_ = &derives::to_value;
@@ -106,6 +118,7 @@ protected:
             {
                 to_t oldTo = to_;
                 to_ = &derives::to_array;
+                v_->clear_array();
                 to(node);
                 to_ = oldTo;
             }
@@ -115,34 +128,39 @@ protected:
         case JSON_NUMBER:
         case JSON_BOOL:
         case JSON_NULL:
-            {
-                json_char *value = 0;
-                switch (type) {
-                case JSON_STRING:
-                    LOG_DEBUG("JSON_STRING");
+            switch (type) {
+            case JSON_STRING:
+                {
+                    json_char *value = 0;
                     if ((value = json_as_string(node))) {
-                        LOG_DEBUG("value = \"" << value << "\"");
+                        LOG_DEBUG("...JSON_STRING value = \"" << value << "\"");
                         v_->put(string(value));
                         json_free(value);
                     }
-                    break;
-                case JSON_NUMBER:
-                    LOG_DEBUG("JSON_NUMBER");
-                    v_->put((int)(json_as_int(node)));
-                    break;
-                case JSON_BOOL:
-                    LOG_DEBUG("JSON_BOOL");
-                    v_->put(json_as_bool(node));
-                    break;
-                case JSON_NULL:
-                    LOG_DEBUG("JSON_NULL");
-                    v_->put(null_node, json::node::name_null());
-                    break;
                 }
+                break;
+            case JSON_NUMBER:
+                {
+                    double value = json_as_float(node);
+                    LOG_DEBUG("...JSON_NUMBER = " << double_to_string(value));
+                    v_->put(value);
+                }
+                break;
+            case JSON_BOOL:
+                {
+                    bool value = json_as_bool(node);
+                    LOG_DEBUG("...JSON_BOOL = " << bool_to_string(value));
+                    v_->put(value);
+                }
+                break;
+            case JSON_NULL:
+                LOG_DEBUG("...JSON_NULL");
+                v_->put(null_node, json::node::name_null());
+                break;
             }
             break;
         default:
-            LOG_ERROR("invalid node type" << type);
+            LOG_ERROR("...invalid node type" << type);
         }
     }
     virtual void to_struct(JSONNODE* node) {
@@ -151,11 +169,11 @@ protected:
         case JSON_NODE:
             LOG_DEBUG("JSON_NODE...");
             {
-                TNode* oldV = v_;
-                TNode v;
-                json_char *name;
+                json_char *name = 0;
                 if ((name = json_name(node))) {
-                    LOG_DEBUG("name = \"" << name << "\"");
+                    TNode* oldV = v_;
+                    TNode v(json::object_node);
+                    LOG_DEBUG("...name = \"" << name << "\"");
                     json_free(name);
                     v_ = &v;
                     to(node);
@@ -171,12 +189,12 @@ protected:
         case JSON_ARRAY:
             LOG_DEBUG("JSON_ARRAY...");
             {
-                to_t oldTo = to_;
-                TNode* oldV = v_;
-                TNode v;
-                json_char *name;
+                json_char *name = 0;
                 if ((name = json_name(node))) {
-                    LOG_DEBUG("name = \"" << name << "\"");
+                    to_t oldTo = to_;
+                    TNode* oldV = v_;
+                    TNode v(json::array_node);
+                    LOG_DEBUG("...name = \"" << name << "\"");
                     json_free(name);
                     v_ = &v;
                     to_ = &derives::to_array;
@@ -196,31 +214,36 @@ protected:
         case JSON_BOOL:
         case JSON_NULL:
             {
-                json_char *name, *value;
+                json_char *name = 0;
                 if ((name = json_name(node))) {
-                    LOG_DEBUG("name = \"" << name << "\"");
+                    LOG_DEBUG("...name = \"" << name << "\"");
                     switch (type) {
                     case JSON_STRING:
-                        LOG_DEBUG("JSON_STRING");
-                        if ((value = json_as_string(node))) {
-                            LOG_DEBUG("value = \"" << value << "\"");
-                            v_->put(name, string_t(value));
-                            json_free(value);
+                        {
+                            json_char *value = 0;
+                            if ((value = json_as_string(node))) {
+                                LOG_DEBUG("...JSON_STRING value = \"" << value << "\"");
+                                v_->put(name, string_t(value));
+                                json_free(value);
+                            }
                         }
                         break;
                     case JSON_NUMBER:
-                        LOG_DEBUG("JSON_NUMBER");
-                        v_->put(name, (int)(json_as_int(node)));
+                        {
+                            double value = json_as_float(node);
+                            LOG_DEBUG("...JSON_NUMBER value = " << double_to_string(value));
+                            v_->put(name, value);
+                        }
                         break;
                     case JSON_BOOL:
                         {
                             bool value = (json_as_bool(node))?(true):(false);
-                            LOG_DEBUG("JSON_BOOL");
+                            LOG_DEBUG("...JSON_BOOL value = " << bool_to_string(value));
                             v_->put(name, value);
                         }
                         break;
                     case JSON_NULL:
-                        LOG_DEBUG("JSON_NULL");
+                        LOG_DEBUG("...JSON_NULL");
                         v_->put(name, null_node, json::node::name_null());
                         break;
                     }
@@ -229,7 +252,7 @@ protected:
             }
             break;
         default:
-            LOG_ERROR("invalid node type" << type);
+            LOG_ERROR("...invalid node type" << type);
         }
     }
     virtual void to_array(JSONNODE* node) {
@@ -240,7 +263,7 @@ protected:
             {
                 to_t oldTo = to_;
                 node_t* oldV = v_;
-                node_t v;
+                node_t v(json::object_node);
                 v_ = &v;
                 to_ = &derives::to_struct;
                 to(node);
@@ -254,7 +277,7 @@ protected:
             LOG_DEBUG("JSON_ARRAY...");
             {
                 node_t* oldV = v_;
-                node_t v;
+                node_t v(json::array_node);
                 v_ = &v;
                 to(node);
                 v_ = oldV;
@@ -269,7 +292,7 @@ protected:
             to_value(node);
             break;
         default:
-            LOG_ERROR("invalid node type" << type);
+            LOG_ERROR("...invalid node type" << type);
         }
     }
 

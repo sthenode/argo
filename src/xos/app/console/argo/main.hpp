@@ -25,6 +25,7 @@
 #include "xos/io/format/json/node.hpp"
 #include "xos/io/format/json/to_string.hpp"
 #include "xos/io/format/json/libjson/to_node.hpp"
+#include "xos/io/crt/file/reader.hpp"
 
 namespace xos {
 namespace app {
@@ -57,10 +58,17 @@ private:
 
 protected:
     virtual int run(int argc, char_t** argv, char_t** env) {
-        io::format::json::node node;
-        io::format::json::libjson::to_node to_node(node, "{ \"is\" : false }");
-        io::format::json::to_string to_string(node);
-        this->outlln("node = \"", string_t(to_string.chars()).chars(), "\"", NULL);
+        const char_t* arg = 0;
+        if ((argc > optind) && (arg = argv[optind]) && (arg) && (arg[0])) {
+            io::crt::file::char_reader file;
+            if ((file.open(arg))) {
+                io::format::json::node node;
+                io::format::json::libjson::to_node to_node(node, file);
+                io::format::json::to_string to_string(node);
+                this->outlln("node = \"", string_t(to_string.chars()).chars(), "\"", NULL);
+                file.close();
+            }
+        }
         return 0;
     }
     

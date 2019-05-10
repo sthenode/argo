@@ -30,84 +30,64 @@ namespace json {
 ///  Class: node
 ///////////////////////////////////////////////////////////////////////
 string& node::to(string &to) const {
-    if (!(values_.size())) {
-        if (named_node > (type_)) {
-            XOS_LOG_ERROR("...invalid node type (" << type_ << ") for value");
+    switch(type_) {
+
+    case number_node:
+    case boolean_node:
+    case null_node:
+        if (0 < (string_.length())) {
+            LOG_DEBUG("...literal " << string_.chars());
+            string_.append_to(to);
         } else {
-            switch(type_) {
-            case number_node:
-            case boolean_node:
-            case null_node:
-                if (0 < (string_.length())) {
-                    XOS_LOG_TRACE("...literal " << string_.chars());
-                    string_.append_to(to);
-                } else {
-                }
-                break;
-            default:
-                if (0 < (string_.length())) {
-                    XOS_LOG_TRACE("...literal \"" << string_.chars() << "\"");
-                    string_.append_literal_to(to);
-                } else {
-                    to.append("\"");
-                    to.append("\"");
-                    XOS_LOG_TRACE("literal \"\"");
-                }
-                break;
-            }
+            LOG_ERROR("...unexpected empty literal");
         }
-    } else {
-        node_list::const_iterator b = values_.begin(), e = values_.end(), i;
-        if (b != e) {
-            const node& v = *b;
-            if (!(string_.length())) {
-                if ((v.string_.length())) {
-                    if ((v.values_.size())) {
-                        if (object_node != (type_)) {
-                            XOS_LOG_ERROR("invalid node type (" << type_ << ") for object");
-                        } else {
-                            XOS_LOG_TRACE("object {...");
-                            to.append("{");
-                            for (i = b; i != e; ++i) {
-                                const node& f = *i;
-                                if ((i != b)) {
-                                    to.append(",");
-                                }
-                                f.to(to);
-                            }
-                            to.append("}");
-                            XOS_LOG_TRACE("...} object");
-                        }
-                    } else {
-                        v.to(to);
+        break;
+
+    case string_node:
+        if (0 < (string_.length())) {
+            LOG_DEBUG("...literal \"" << string_.chars() << "\"");
+            string_.append_literal_to(to);
+        } else {
+            to.append("\"");
+            to.append("\"");
+            LOG_DEBUG("...literal \"\"");
+        }
+        break;
+
+    case named_node:
+    case array_node:
+    case object_node:
+        if (0 < (values_.size())) {
+            node_list::const_iterator b = values_.begin(), e = values_.end();
+
+            if (named_node != (type_)) {
+                LOG_DEBUG(((array_node != (type_))?("object {"):("array [")) << "...");
+                to.append((array_node != (type_))?("{"):("["));
+                for (node_list::const_iterator i = b; i != e; ++i) {
+                    const node& v = *i;
+                    if ((i != b)) {
+                        to.append(",");
                     }
-                } else {
-                    if (array_node != (type_)) {
-                        XOS_LOG_ERROR("invalid node type (" << type_ << ") for array");
-                    } else {
-                        XOS_LOG_TRACE("array [...");
-                        to.append("[");
-                        for (i = b; i != e; ++i) {
-                            const node& e = *i;
-                            if ((i != b)) {
-                                to.append(",");
-                            }
-                            e.to(to);
-                        }
-                        to.append("]");
-                        XOS_LOG_TRACE("...] array");
-                    }
+                    v.to(to);
                 }
+                to.append((array_node != (type_))?("}"):("]"));
+                LOG_DEBUG("..." << ((array_node != (type_))?("} object"):("] array")));
             } else {
-                if ((named_node == type_)) {
-                    to.append("\"");
-                    to.append(string_);
-                    to.append("\":");
-                    XOS_LOG_TRACE("\"" << string_.chars() << "\":");
-                }
+                const node& v = *b;
+                to.append("\"");
+                to.append(string_);
+                to.append("\":");
+                LOG_DEBUG("...named \"" << string_.chars() << "\":");
                 v.to(to);
             }
+        } else {
+            LOG_ERROR("...unexpected empty values");
         }
+        break;
+
+    default:
+        LOG_ERROR("...unexpected type = " << type_);
+        break;
     }
     return to;
 }
@@ -116,4 +96,3 @@ string& node::to(string &to) const {
 } /// namespace format
 } /// namespace io
 } /// namespace xos
-
