@@ -32,14 +32,10 @@ namespace format {
 namespace json {
 namespace libjson {
 
-typedef base::implements to_nodet_implements;
-typedef base to_nodet_extends;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: to_nodet
 ///////////////////////////////////////////////////////////////////////
-template 
-<class TNode = json::node, class TString = json::string,
- class TImplements = to_nodet_implements, class TExtends = to_nodet_extends>
+template <class TExtends = json::node, class TImplements = typename TExtends::implements>
 
 class _EXPORT_CLASS to_nodet: virtual public TImplements, public TExtends {
 public:
@@ -47,8 +43,8 @@ public:
     typedef TExtends extends;
     typedef to_nodet derives;
 
-    typedef TNode node_t;
-    typedef TString string_t;
+    typedef json::node node_t;
+    typedef json::string string_t;
     typedef typename string_t::char_t char_t;
     
     to_nodet(node_t& to, char_reader& from): to_(0), v_(0) {
@@ -57,11 +53,24 @@ public:
     to_nodet(node_t& to, const char_string& from): to_(0), v_(0) {
         this->to(to, from);
     }
-    to_nodet(const to_nodet &copy): to_(0), v_(copy.v_) {
+    to_nodet(char_reader& from): to_(0), v_(0) {
+        this->from(from);
+    }
+    to_nodet(const char_string& from): to_(0), v_(0) {
+        this->from(from);
+    }
+    to_nodet(const to_nodet &copy): extends(copy), to_(0), v_(0) {
     }
     to_nodet(): to_(0), v_(0) {
     }
     virtual ~to_nodet() {
+    }
+
+    virtual node_t& from(char_reader& from) {
+        return this->to(*this, from);
+    }
+    virtual node_t& from(const char_string& from) {
+        return this->to(*this, from);
     }
 
     virtual node_t& to(node_t& to, char_reader& from) {
@@ -171,8 +180,8 @@ protected:
             {
                 json_char *name = 0;
                 if ((name = json_name(node))) {
-                    TNode* oldV = v_;
-                    TNode v(json::object_node);
+                    node_t* oldV = v_;
+                    node_t v(json::object_node);
                     LOG_DEBUG("...name = \"" << name << "\"");
                     json_free(name);
                     v_ = &v;
@@ -192,8 +201,8 @@ protected:
                 json_char *name = 0;
                 if ((name = json_name(node))) {
                     to_t oldTo = to_;
-                    TNode* oldV = v_;
-                    TNode v(json::array_node);
+                    node_t* oldV = v_;
+                    node_t v(json::array_node);
                     LOG_DEBUG("...name = \"" << name << "\"");
                     json_free(name);
                     v_ = &v;

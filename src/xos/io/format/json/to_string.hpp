@@ -28,8 +28,8 @@ namespace io {
 namespace format {
 namespace json {
 
-typedef string::implements to_stringt_implements;
 typedef string to_stringt_extends;
+typedef to_stringt_extends::implements to_stringt_implements;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: to_stringt
 ///////////////////////////////////////////////////////////////////////

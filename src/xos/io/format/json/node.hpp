@@ -22,6 +22,7 @@
 #define _XOS_IO_FORMAT_JSON_NODE_HPP
 
 #include "xos/io/format/json/string.hpp"
+#include "xos/io/reader.hpp"
 #include <sstream>
 #include <list>
 
@@ -54,8 +55,8 @@ enum node_type {
 
 class _EXPORT_CLASS node;
 typedef ::std::list<node> node_list;
-typedef base::implements node_implements;
 typedef base node_extends;
+typedef node_extends::implements node_implements;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: node
 ///////////////////////////////////////////////////////////////////////
@@ -67,7 +68,6 @@ public:
     node(const string& name, const node_type& type, const string& value) {
         assign(name, type, value);
     }
-
     node(const string& name, const char* value) {
         assign(name, value);
     }
@@ -92,7 +92,6 @@ public:
     node(const string& name, const node& value) {
         assign(name, value);
     }
-
     node(const char* value) {
         this->operator = (value);
     }
@@ -114,7 +113,6 @@ public:
     node(const bool& value) {
         this->operator = (value);
     }
-
     node(const node &copy)
     : type_(copy.type_), string_(copy.string_), number_(copy.number_), 
       boolean_(copy.boolean_), values_(copy.values_) {
@@ -141,7 +139,6 @@ public:
         values_.push_back(node(type, value));
         return *this;
     }
-
     virtual node& assign(const string& name, const char* value) {
         clear();
         type_ = named_node;
@@ -356,7 +353,6 @@ public:
         values_.push_back(node(name, type, value));
         return *this;
     }
-
     virtual node& put(const node_type& type, const char* name) {
         string sName(name);
         values_.push_back(node(type, sName));
@@ -371,7 +367,6 @@ public:
         values_.push_back(node(type, name));
         return *this;
     }
-
     virtual node& put(const char* value) {
         values_.push_back(node(value));
         return *this;
@@ -461,6 +456,18 @@ public:
         return *this;
     }
     
+    static string name_type(const node_type& type) {
+        switch (type) {
+        case object_node:  return "object";
+        case array_node:   return "array";
+        case named_node:   return "named";
+        case string_node:  return "string";
+        case number_node:  return "number";
+        case boolean_node: return "boolean";
+        case null_node:    return "null";
+        }
+        return "unknown";
+    }
     static string name_true() {
         return "true";
     }
@@ -475,20 +482,8 @@ public:
         return null;
     }
     
-    static string type_name(const node_type& type) {
-        switch (type) {
-        case object_node:  return "object";
-        case array_node:   return "array";
-        case named_node:   return "named";
-        case string_node:  return "string";
-        case number_node:  return "number";
-        case boolean_node: return "boolean";
-        case null_node:    return "null";
-        }
-        return "unknown";
-    }
     virtual string type_name() const {
-        return type_name(type_);
+        return name_type(type_);
     }
     virtual const node_type& type() const {
         return type_;
@@ -516,7 +511,15 @@ public:
     virtual operator boolean() const {
         return boolean_;
     }
+
+    virtual node& from(char_reader& from) {
+        return *this;
+    }
+    virtual node& from(const char_string& from) {
+        return *this;
+    }
     virtual string& to(string& to) const;
+
 protected:
     virtual const node* find(const string& name) const {
         node_list::const_iterator begin = values_.begin(), end = values_.end();

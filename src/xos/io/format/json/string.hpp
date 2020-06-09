@@ -28,8 +28,8 @@ namespace io {
 namespace format {
 namespace json {
 
-typedef wchar_string::implements string_implements;
-typedef wchar_string string_extends;
+typedef char_string string_extends;
+typedef string_extends::implements string_implements;
 ///////////////////////////////////////////////////////////////////////
 ///  Class: string
 ///////////////////////////////////////////////////////////////////////
@@ -41,11 +41,11 @@ public:
     string(const char* chars, size_t length) {
         this->append(chars, length);
     }
-    string(const char* chars) {
-        this->append(chars);
-    }
     string(const wchar_t* chars, size_t length) {
         this->append(chars, length);
+    }
+    string(const char* chars) {
+        this->append(chars);
     }
     string(const wchar_t* chars) {
         this->append(chars);
