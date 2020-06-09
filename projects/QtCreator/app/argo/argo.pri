@@ -53,6 +53,7 @@ $${argo_DEFINES} \
 # argo_exe HEADERS
 #
 argo_exe_HEADERS += \
+$${ARGO_SRC}/xos/io/format/json/string.hpp \
 $${ARGO_SRC}/xos/io/format/json/node.hpp \
 $${ARGO_SRC}/xos/io/format/json/to_string.hpp \
 $${ARGO_SRC}/xos/io/format/json/libjson/to_node.hpp \
@@ -63,6 +64,7 @@ $${ARGO_SRC}/xos/app/console/argo/main.hpp \
 # argo_exe SOURCES
 #
 argo_exe_SOURCES += \
+$${ARGO_SRC}/xos/io/format/json/string.cpp \
 $${ARGO_SRC}/xos/io/format/json/node.cpp \
 $${ARGO_SRC}/xos/io/format/json/to_string.cpp \
 $${ARGO_SRC}/xos/io/format/json/libjson/to_node.cpp \
